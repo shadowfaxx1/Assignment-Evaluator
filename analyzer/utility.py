@@ -98,7 +98,6 @@ class utility():
         low_avg_sentence_length_threshold = 15
         low_pc_threshold = 3
 
-        # Analyze structure based on thresholds
         if word_count > high_word_count_threshold:
             return "Extensive Content"
         elif avg_sentence_length < low_avg_sentence_length_threshold or pc > low_pc_threshold:
@@ -122,11 +121,8 @@ class utility():
     @staticmethod
           
     def sentiment(pos_score, neg_score, polarity, subjectivity):
-    # Define thresholds for sentiment labels
         positive_threshold = 0.6
         negative_threshold = -0.6
-
-        # Analyze sentiment based on thresholds
         if pos_score > neg_score and polarity > positive_threshold and subjectivity > 0.5:
             return "Positive Sentiment"
         elif neg_score > pos_score and polarity < negative_threshold and subjectivity > 0.5:
@@ -150,7 +146,7 @@ class utility():
             }
             headers = {
                 "content-type": "application/json",
-                "X-RapidAPI-Key": "3e601078f0msh68d15a818fa4eb7p1a5625jsnf599a1b10a08",
+                "X-RapidAPI-Key": "your-api-key",
                 "X-RapidAPI-Host": "plagiarism-checker-and-auto-citation-generator-multi-lingual.p.rapidapi.com"
             }
             response = requests.post(url, json=payload, headers=headers)
