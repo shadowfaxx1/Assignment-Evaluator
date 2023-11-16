@@ -14,9 +14,9 @@ from db.plotterdb import con_create,save_ass
 nltk.download('stopwords')
 nltk.download('punkt')
 nltk.download('wordnet')
-stopwordpath =r"C:\Users\kaifk\lpth\.vscode\AutomatingTask\assignment_evaluation_app\app\StopWords"
-pospath= r"C:\Users\kaifk\lpth\.vscode\AutomatingTask\assignment_evaluation_app\app\MasterDictionary\positive-words.txt"
-negpath =r"C:\Users\kaifk\lpth\.vscode\AutomatingTask\assignment_evaluation_app\app\MasterDictionary\negative-words.txt"
+stopwordpath =r"your-path-for-stopword\StopWords"
+pospath= r"your-path-for-postivewordlib\positive-words.txt"
+negpath =r"your-path-for-negativewords\negative-words.txt"
 
 class evaluator:
     def __init__(self):
