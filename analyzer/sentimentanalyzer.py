@@ -10,13 +10,16 @@ import re
 import pandas as pd
 from prettytable import PrettyTable
 from db.plotterdb import con_create,save_ass
+from nltk.sentiment import SentimentIntensityAnalyzer
 
 nltk.download('stopwords')
 nltk.download('punkt')
 nltk.download('wordnet')
-stopwordpath =r"your-path-for-stopword\StopWords"
-pospath= r"your-path-for-postivewordlib\positive-words.txt"
-negpath =r"your-path-for-negativewords\negative-words.txt"
+nltk.download('vader_lexicon')
+
+stopwordpath =r"C:\Users\kaifk\lpth\.vscode\AutomatingTask\assignment_evaluation_app\app\StopWords"
+pospath= r"C:\Users\kaifk\lpth\.vscode\AutomatingTask\assignment_evaluation_app\app\MasterDictionary\positive-words.txt"
+negpath =r"C:\Users\kaifk\lpth\.vscode\AutomatingTask\assignment_evaluation_app\app\MasterDictionary\negative-words.txt"
 
 class evaluator:
     def __init__(self):
@@ -36,17 +39,6 @@ class evaluator:
 
         with open(dictionary_positive, "r") as fz:
             self.dict_p.update(fz.read().splitlines())
-
-    # def write_into_csv(self, x):
-    #     columns = ["url", "Positive Sentences", "Negative Sentences", "Polarity", "Subjectivity", 
-    #                "Average Sentence Length", "Complex Word Percentage", "Fog Index", "Average Word Length", 
-    #                "Complex Word Count", "Word Count", "Syllable Count", "Personal Pronouns"]
-
-    #     with open(r"output.csv", 'w', encoding='utf-8', newline='') as fp:
-    #         wr = csv.writer(fp)
-    #         wr.writerow(columns)
-    #         wr.writerows(x)
-    #     fp.close()
 
     def count_syl(self, w):
         vowels = 'aeiou'
@@ -68,7 +60,7 @@ class evaluator:
         count = len(matches)
         return count
 
-    def sentiment_analysis(self, text,enr):
+    def sentiment_analysis(self, text,enr)->list:
         # Tokenization and lemmatization
         pc = self.count_pronouns(text)
         tokens = nltk.word_tokenize(text.lower())
@@ -85,8 +77,11 @@ class evaluator:
         neg_s = sum(1 for i in tokens if i in self.dict_n)
 
         # Polarity 
+        
         polarity = (pos_s - neg_s) / (pos_s + neg_s + 0.000001)
         sentences = nltk.sent_tokenize(text)
+        sia = SentimentIntensityAnalyzer()
+        sentiment_scores = sia.polarity_scores(text)
 
         # Calculate the word count 
         word_count = len(tokens)
@@ -110,6 +105,7 @@ class evaluator:
         sum_of_sent = sum(len(nltk.word_tokenize(sentence)) for sentence in sentences)
         avg_sent = sum_of_sent / len(sentences)
         fog_index = 0.4 * (avg_sent) + cmp_percentage
+
         conn = con_create()
         if conn:
             cursor = conn.cursor()
@@ -120,19 +116,15 @@ class evaluator:
         
         x = [pos_s, neg_s, polarity, subjectivity, avg_sent, cmp_percentage, fog_index, 
              avg_words, complex_count, word_count, syl_count, pc]
-        
-        print(x)
-
         return x
     
     def cleaning_file(self, text):
         cleaned_text = ' '.join([word for word in text.split() if word.lower() not in self.stopw])
         return cleaned_text
 
-    def gathering_info(self, text,enr):
+    def gathering_info(self, text,enr)->list:
+        result=[]
         cleaned_file = self.cleaning_file(text)
-        print(cleaned_file)
-        
         result = self.sentiment_analysis(cleaned_file,enr)
         return result 
     
