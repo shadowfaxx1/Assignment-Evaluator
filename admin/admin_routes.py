@@ -4,6 +4,7 @@ from db.database import create_connection
 import pandas as pd
 import time
 from admin.datadisplayer import datashow
+from db.resultdb import create_conn
 # Hardcoded admin credentials (replace with a more secure method in a production environment)
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
@@ -47,20 +48,6 @@ def admin_home():
         if assignments:
             # Convert the assignments to a pandas DataFrame for better presentation
             df = pd.DataFrame(assignments, columns=[col[0] for col in cursor.description]).set_index("id")
-            # styled_df = (
-            #     df.style
-            #     .set_properties(**{'text-align': 'left'})
-            #     .background_gradient(cmap='viridis')
-            #     .bar(color='black')
-            #     .format({'YourColumn': '{:,.2f}'})
-            #     .set_caption('Your Custom Caption')
-            #     .set_table_styles([
-            #         {'selector': 'th', 'props': [('font-size', '16px'), ('color', 'white'), ('background-color', 'black')]},
-            #         {'selector': 'td', 'props': [('color', 'white'), ('background-color', 'black')]}
-            #     ])
-            # )
-            # st.dataframe(df.style.set_properties(**{'text-align': 'left'}))
-            # st.dataframe(styled_df)
             markdown_table = df.to_markdown(index=False)
 
             # Display Markdown table
@@ -69,6 +56,19 @@ def admin_home():
         
         else:
             st.write("No assignments found.")
+    zonn = create_conn()
+    if zonn:
+        cur = zonn.cursor()
+        cur.execute("select * from student_results")
+        finalres = cur.fetchall()
+        zonn.close()
+        if finalres:
+                df = pd.DataFrame(finalres, columns=[col[0] for col in cur.description]).set_index("enrollment_number")
+                df.drop(['id'],axis=1)
+                st.write(df)
+    else:
+         print("no final report right now ")
+
     if session_state.is_admin_authenticated and st.sidebar.button("Reports"):
                 datashow()
 
